@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const validator=require("validator")
 
 const User = mongoose.model("User", {
   name: {
@@ -20,6 +21,15 @@ const User = mongoose.model("User", {
       }
     },
   },
+  email:{
+    type: String,
+    trim: true,
+    validate(value){
+      if(!validator.isEmail(value)){
+        throw new Error("Not a valid Email")
+      }
+    }
+  }
 });
 
 module.exports = User;

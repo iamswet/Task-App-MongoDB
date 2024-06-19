@@ -1,5 +1,5 @@
 const express = require("express");
-const tasks=require("./../models/task")
+const tasks = require("./../models/task");
 const router = new express.Router();
 
 router.post("/create-task", async (req, res) => {
@@ -31,6 +31,16 @@ router.get("/fetchtasks", async (req, res) => {
 });
 
 router.patch("/update-task/:id", async (req, res) => {
+  const updates = Object.keys(req.body);
+  const allowedUpdates = ["description", "completed"];
+  const isValidOperation = updates.every((update) =>
+    allowedUpdates.includes(update)
+  );
+
+  if (!isValidOperation) {
+    return res.status(400).send({ error: "Invalid Operation" });
+  }
+
   try {
     const task = await tasks.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
