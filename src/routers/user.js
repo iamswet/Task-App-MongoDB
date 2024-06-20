@@ -3,6 +3,17 @@ const User=require('../models/user')
 const router = new express.Router();
 
 
+router.post("/user/login",async(req,res)=>{
+  
+  try{
+    const user = await User.findByCredentials(req.body.email,req.body.password)
+    res.status(200).send(user)
+  }catch(error){
+    return res.status(400).send(error)
+  }
+
+})
+
 router.post("/create-user", async (req, res) => {
   const user1 = new User(req.body);
   try {
@@ -56,10 +67,13 @@ router.get("/fetch/:id", async (req, res) => {
     }
 
     try {
-      const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,
-        runValidators: true,
-      });
+      const user=await User.findById(req.params.id)
+      updates.forEach((update)=>{
+        user[update]=req.body[update]
+      })
+      await user.save()
+
+      //const user = await User.findByIdAndUpdate(req.params.id, req.body, {  new: true, runValidators: true, });
       if (!user) {
         return res.status(404).send();
       }
