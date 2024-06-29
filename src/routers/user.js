@@ -49,7 +49,7 @@ router.post('/users/logout',auth,async(req,res)=>{
     res.status(500).send(error)
   }
 })
-
+ 
 router.post('/users/logoutall',auth,async(req,res)=>{
   try{
     req.user.tokens=[]
