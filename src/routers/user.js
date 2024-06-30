@@ -3,7 +3,7 @@ const User=require('../models/user')
 const auth=require('../middleware/auth')
 const router = new express.Router();
 
-
+//only authenticate login
 router.post("/user/login",async(req,res)=>{
   
   try{
