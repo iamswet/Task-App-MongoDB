@@ -45,6 +45,7 @@ const userschema = mongoose.Schema({
 });
 
 //userschema.methods.userPublicProfile= function(){             toJSON is used to return what we want hence we decide what data to send. instead of setting userPublicProfile, we simply use to JSON
+/**
 userschema.methods.toJSON = async function () {
   const user = this;
   const userObject = user.toObject();
@@ -52,7 +53,7 @@ userschema.methods.toJSON = async function () {
   delete userObject.tokens;
   return userObject;
 };
-
+ */
 userschema.methods.generateAuthToken = async function () {
   const user = this;
   const token = jwt.sign({ _id: user._id.toString() }, "finishbysunday");
