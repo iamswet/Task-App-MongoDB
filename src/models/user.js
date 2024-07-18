@@ -54,6 +54,15 @@ userschema.methods.toJSON = async function () {
   return userObject;
 };
  */
+
+
+//referencing with the tasks table  ref: table name, locafield: name of field in user table, foreginfield: name of foreign key in task table
+userschema.virtual('tasks',{
+  ref:'Task',
+  localField:'_id',
+  foreignField:'owner'
+})
+
 userschema.methods.generateAuthToken = async function () {
   const user = this;
   const token = jwt.sign({ _id: user._id.toString() }, "finishbysunday");
