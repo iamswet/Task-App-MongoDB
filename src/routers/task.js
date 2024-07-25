@@ -29,6 +29,7 @@ router.post("/create-task", auth, async (req, res) => {
 router.get("/fetchtasks",auth ,async (req, res) => {
   try {
     const task1 = await tasks.find({owner:req.user._id});
+    //await req.user.populate('tasks').execPopulate()
     res.send(task1);
   } catch (error) {
     res.status(400).send(error);
@@ -47,7 +48,7 @@ router.get("/tasks/:id", auth, async (req, res) => {
   }
 });
 
-router.patch("/update-task/:id", async (req, res) => {
+router.patch("/update-task/:id",auth, async (req, res) => {
   const updates = Object.keys(req.body);
   const allowedUpdates = ["description", "completed"];
   const isValidOperation = updates.every((update) =>
@@ -59,26 +60,29 @@ router.patch("/update-task/:id", async (req, res) => {
   }
 
   try {
-    const taskinconsider = await tasks.findById(req.params.id);
+    const taskinconsider = await tasks.findOne({ _id: req.params.id, owner: req.user._id });
+    //const taskinconsider = await tasks.findById(req.params.id);
+    
+    //const task = await tasks.findByIdAndUpdate(req.params.id, req.body, {new: true,runValidators: true,});
+    if (!taskinconsider) {
+      return res.send().status(400);
+    }
     updates.forEach((update) => {
       taskinconsider[update] = req.body[update];
     });
     await taskinconsider.save();
 
-    //const task = await tasks.findByIdAndUpdate(req.params.id, req.body, {new: true,runValidators: true,});
-    if (!task) {
-      return res.send().status(400);
-    }
     res.send(task).status(200);
   } catch (error) {
     res.send(error).status(400);
   }
 });
 
-router.delete("/delete-task/:id", async (req, res) => {
+router.delete("/delete-task/:id",auth, async (req, res) => {
   try {
-    const task1 = await tasks.findByIdAndDelete(req.params.id);
-    if (!task1) {
+//    const task1 = await tasks.findByIdAndDelete(req.params.id);
+    const task1=await tasks.findOneAndDelete({_id:req.params.id, owner:req.user._id})
+if (!task1) {
       res.send().status(400);
     }
     res.send(task1).status(200);
