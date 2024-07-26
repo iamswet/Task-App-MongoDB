@@ -2,48 +2,53 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const Task=require("./task")
+const Task = require("./task");
 
-const userschema = mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-  },
-  age: {
-    type: Number,
-    required: true,
-  },
-  password: {
-    type: String,
-    required: true,
-    trim: true,
-    minLength: 7,
-    validate(value) {
-      if (value.includes("password")) {
-        throw new Error("Cannot contain sub string 'password'");
-      }
+const userschema = mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
     },
-  },
-  email: {
-    type: String,
-    trim: true,
-    unique: true,
-    required: true,
-    validate(value) {
-      if (!validator.isEmail(value)) {
-        throw new Error("Not a valid Email");
-      }
+    age: {
+      type: Number,
+      required: true,
     },
-  },
-  tokens: [
-    {
-      token: {
-        type: String,
-        required: true,
+    password: {
+      type: String,
+      required: true,
+      trim: true,
+      minLength: 7,
+      validate(value) {
+        if (value.includes("password")) {
+          throw new Error("Cannot contain sub string 'password'");
+        }
       },
     },
-  ],
-});
+    email: {
+      type: String,
+      trim: true,
+      unique: true,
+      required: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error("Not a valid Email");
+        }
+      },
+    },
+    tokens: [
+      {
+        token: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
+  },
+  {
+    timestamps: true,
+  }
+);
 
 //userschema.methods.userPublicProfile= function(){             toJSON is used to return what we want hence we decide what data to send. instead of setting userPublicProfile, we simply use to JSON
 /**
@@ -56,13 +61,12 @@ userschema.methods.toJSON = async function () {
 };
  */
 
-
 //referencing with the tasks table  ref: table name, locafield: name of field in user table, foreginfield: name of foreign key in task table
-userschema.virtual('tasks',{
-  ref:'Task',
-  localField:'_id',
-  foreignField:'owner'
-})
+userschema.virtual("tasks", {
+  ref: "Task",
+  localField: "_id",
+  foreignField: "owner",
+});
 
 userschema.methods.generateAuthToken = async function () {
   const user = this;
@@ -98,12 +102,11 @@ userschema.pre("save", async function (next) {
 });
 
 //Delete Cascade for tasks
-userschema.pre("remove", async function(next){
-  const user=this
-  await Task.deleteMany({owner:user._id})
-  next()
-})
-
+userschema.pre("remove", async function (next) {
+  const user = this;
+  await Task.deleteMany({ owner: user._id });
+  next();
+});
 
 const User = mongoose.model("User", userschema);
 
