@@ -27,6 +27,7 @@ router.post("/create-task", auth, async (req, res) => {
 });
 
 //fetchtasks?sortBy=createdAt:desc
+//1 for asceding -1 for descending, in the below code we implement for the same using logic
 router.get("/fetchtasks", auth, async (req, res) => {
   const match = {};
   const sort = {};
