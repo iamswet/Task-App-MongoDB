@@ -2,11 +2,25 @@ const express = require("express");
 require("./db/mongoose");
 const userRouter = require("./routers/user");
 const taskRouter = require("./routers/task");
+const multer = require("multer")
+
 
 //  /d/Language/NodeJS/mongo/mongodb/bin/mongod.exe --dbpath="/d/Language/NodeJS/mongo/mongodb-data"
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+const upload=multer({
+  data: 'images'
+})
+app.post('/upload',upload.single('upload'),(req,res)=>{
+  try{
+    res.send("image uploaded")
+  }catch(error){
+    console.log(error)
+    next(error)
+  }
+})
 
 app.use(express.json());
 app.use(userRouter)

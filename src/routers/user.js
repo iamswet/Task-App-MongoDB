@@ -1,6 +1,7 @@
 const express = require("express");
 const User = require("../models/user");
 const auth = require("../middleware/auth");
+const multer=require("multer")
 const router = new express.Router();
 
 //creating user
@@ -128,6 +129,19 @@ router.patch("/users/me", auth, async (req, res) => {
       return res.status(404).send();
     }
  */
+
+const upload=multer({
+  data:'avatar'
+})
+
+
+router.post("/users/me/avatar",upload.single('avatar'),(req,res)=>{
+  try{
+    res.send()
+  }catch(error){
+    next(error)
+  }
+})
 
 router.delete("/users/me", auth, async (req, res) => {
   try {
