@@ -44,6 +44,9 @@ const userschema = mongoose.Schema(
         },
       },
     ],
+    avatar: {
+      type: Buffer,
+    },
   },
   {
     timestamps: true,
@@ -51,15 +54,15 @@ const userschema = mongoose.Schema(
 );
 
 //userschema.methods.userPublicProfile= function(){             toJSON is used to return what we want hence we decide what data to send. instead of setting userPublicProfile, we simply use to JSON
-/**
+
 userschema.methods.toJSON = async function () {
   const user = this;
   const userObject = user.toObject();
   delete userObject.password;
   delete userObject.tokens;
+  delete userObject.avatar;
   return userObject;
 };
- */
 
 //referencing with the tasks table  ref: table name, locafield: name of field in user table, foreginfield: name of foreign key in task table
 userschema.virtual("tasks", {

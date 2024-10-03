@@ -1,7 +1,8 @@
 const express = require("express");
 const User = require("../models/user");
 const auth = require("../middleware/auth");
-const multer=require("multer")
+const sharp= require("sharp")
+const multer = require("multer");
 const router = new express.Router();
 
 //creating user
@@ -130,17 +131,61 @@ router.patch("/users/me", auth, async (req, res) => {
     }
  */
 
-const upload=multer({
-  data:'avatar'
+const upload = multer({
+  // the destination is used to mention the folder location where the file would be saved
+  //  dest: "avatar",
+  //limits is used to mention the file size and other properties too
+  limits: {
+    fileSize: 10000000,
+  },
+
+  //the file filter is simply meant to validate the file and ensure if it is an image or anything else
+  fileFilter(req, file, cb) {
+    //if(!file.originalname.endsWith(".pdf"))
+    if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+      return cb(new CustomError("Please upload an image ONLY"));
+    }
+
+    return cb(undefined, true);
+  },
+});
+
+router.post(
+  "/users/me/avatar",
+  auth,
+  upload.single("avatar"),
+  async (req, res) => {
+    const buffer=await sharp(req.file.buffer).resize({width:250,height:250}).png().toBuffer()
+    //req.user.avatar=req.file.buffer
+    req.user.avatar=buffer
+    await req.user.save()
+    res.send()
+  },
+  (error, req, res, next) => {
+    res.status(400).send({ error: error.message });
+  }
+);
+
+router.delete("/users/me/avatar",auth,async(req,res)=>{
+  req.user.avatar=undefined
+  await req.user.save()
+  res.send()
 })
 
-
-router.post("/users/me/avatar",upload.single('avatar'),(req,res)=>{
+router.get("/users/:id/avatar",async (req,res)=>{
   try{
-    res.send()
+    const user=await User.findById(req.params.id)
+    if(!user || !user.avatar){
+      throw new Error()
+    }
+    res.set('Content-Type','image/png')
+    res.set('Content-Disposition', 'inline')
+    res.send(user.avatar)
+
   }catch(error){
-    next(error)
+    res.status(400).send()
   }
+
 })
 
 router.delete("/users/me", auth, async (req, res) => {
